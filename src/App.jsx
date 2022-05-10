@@ -66,6 +66,7 @@ const App = () => {
         const account = accounts[0];
         console.log("Found an authorized account:", account);
         setCurrentAccount(account);
+        getAllWaves();
       } else {
         console.log("No authorized account found");
       }
@@ -86,13 +87,13 @@ const App = () => {
       const accounts = await ethereum.request({
         method: "eth_requestAccounts",
       });
-
       console.log("Connected", accounts[0]);
       setCurrentAccount(accounts[0]);
     } catch (error) {
       console.log(error);
     }
   };
+
   const wave = async () => {
     try {
       const { ethereum } = window;
@@ -109,7 +110,7 @@ const App = () => {
         let count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
 
-        const waveTxn = await wavePortalContract.wave("this is a message");
+        const waveTxn = await wavePortalContract.wave("Hey there");
         console.log("Mining...", waveTxn.hash);
 
         await waveTxn.wait();
