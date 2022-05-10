@@ -7,7 +7,7 @@ const App = () => {
   const [currentAccount, setCurrentAccount] = useState("");
 
   const [allWaves, setAllWaves] = useState([]);
-  const contractAddress = "0x7b8D0420BD1cCf7AF07739E4D08E0db704C8C7d4";
+  const contractAddress = "0xb8Fed266Ea9A38ea5740E3A0B78d6821ca2ad26B";
 
   const contractABI = abi.abi;
 
@@ -109,7 +109,7 @@ const App = () => {
         let count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
 
-        const waveTxn = await wavePortalContract.wave();
+        const waveTxn = await wavePortalContract.wave("this is a message");
         console.log("Mining...", waveTxn.hash);
 
         await waveTxn.wait();
@@ -135,8 +135,8 @@ const App = () => {
         <div className="header">👋 Hey there!</div>
 
         <div className="bio">
-          I am farza and I worked on self-driving cars so that's pretty cool
-          right? Connect your Ethereum wallet and wave at me!
+          I am Kunal and i am enthusiastic for this technology.Connect your
+          Ethereum wallet and wave at me!
         </div>
 
         <button className="waveButton" onClick={wave}>
@@ -149,7 +149,7 @@ const App = () => {
           </button>
         )}
 
-        {/* {allWaves.map((wave, index) => {
+        {allWaves.map((wave, index) => {
           return (
             <div
               key={index}
@@ -164,7 +164,7 @@ const App = () => {
               <div>Message: {wave.message}</div>
             </div>
           );
-        })} */}
+        })}
       </div>
     </div>
   );
