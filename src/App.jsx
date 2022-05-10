@@ -11,9 +11,6 @@ const App = () => {
 
   const contractABI = abi.abi;
 
-  /*
-   * Create a method that gets all waves from your contract
-   */
   const getAllWaves = async () => {
     try {
       const { ethereum } = window;
@@ -135,12 +132,11 @@ const App = () => {
   return (
     <div className="mainContainer">
       <div className="dataContainer">
-        <div className="header">
-          👋 Hey there!
-        </div>
+        <div className="header">👋 Hey there!</div>
 
         <div className="bio">
-          I am farza and I worked on self-driving cars so that's pretty cool right? Connect your Ethereum wallet and wave at me!
+          I am farza and I worked on self-driving cars so that's pretty cool
+          right? Connect your Ethereum wallet and wave at me!
         </div>
 
         <button className="waveButton" onClick={wave}>
@@ -153,16 +149,24 @@ const App = () => {
           </button>
         )}
 
-        {allWaves.map((wave, index) => {
+        {/* {allWaves.map((wave, index) => {
           return (
-            <div key={index} style={{ backgroundColor: "OldLace", marginTop: "16px", padding: "8px" }}>
+            <div
+              key={index}
+              style={{
+                backgroundColor: "OldLace",
+                marginTop: "16px",
+                padding: "8px",
+              }}
+            >
               <div>Address: {wave.address}</div>
               <div>Time: {wave.timestamp.toString()}</div>
               <div>Message: {wave.message}</div>
-            </div>)
-        })}
+            </div>
+          );
+        })} */}
       </div>
     </div>
   );
-
+};
 export default App;
