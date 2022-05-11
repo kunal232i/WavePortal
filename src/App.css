@@ -1,8 +1,11 @@
 .mainContainer {
   display: flex;
   justify-content: center;
-  width: 100%;
   margin-top: 64px;
+  margin-left: 20px;
+  margin-right: 20px;
+  padding-bottom: 30px;
+  position: relative;
 }
 
 .dataContainer {

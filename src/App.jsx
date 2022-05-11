@@ -5,6 +5,7 @@ import abi from "./utils/WavePortal.json";
 
 const App = () => {
   const [currentAccount, setCurrentAccount] = useState("");
+  const [message, setMessage] = useState("");
 
   const [allWaves, setAllWaves] = useState([]);
   const contractAddress = "0xb8Fed266Ea9A38ea5740E3A0B78d6821ca2ad26B";
@@ -96,6 +97,10 @@ const App = () => {
 
   const wave = async () => {
     try {
+      if (!message) {
+        alert("Please write a message");
+        return;
+      }
       const { ethereum } = window;
 
       if (ethereum) {
@@ -110,7 +115,7 @@ const App = () => {
         let count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
 
-        const waveTxn = await wavePortalContract.wave("Hey there");
+        const waveTxn = await wavePortalContract.wave(message);
         console.log("Mining...", waveTxn.hash);
 
         await waveTxn.wait();
@@ -119,6 +124,7 @@ const App = () => {
         getAllWaves();
         count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
+        setMessage("");
       } else {
         console.log("Ethereum object doesn't exist!");
       }
@@ -150,7 +156,12 @@ const App = () => {
         </div>
 
         <div id="inputContainer">
-          <input id="msgInput" />
+          <input
+            id="msgInput"
+            onChange={(e) => {
+              setMessage(e.target.value);
+            }}
+          />
           <button className="waveButton" onClick={wave}>
             Wave at Me
           </button>
@@ -161,6 +172,8 @@ const App = () => {
             Connect Wallet
           </button>
         )}
+
+        <h3 style={{ marginBottom: 0 }}>Messages:</h3>
 
         {allWaves.map((wave, index) => {
           return (
