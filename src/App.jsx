@@ -116,6 +116,7 @@ const App = () => {
         await waveTxn.wait();
         console.log("Mined -- ", waveTxn.hash);
 
+        getAllWaves();
         count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
       } else {
@@ -133,16 +134,27 @@ const App = () => {
   return (
     <div className="mainContainer">
       <div className="dataContainer">
-        <div className="header">👋 Hey there!</div>
+        <h1 className="header">👋 Hey there!</h1>
 
         <div className="bio">
-          I am Kunal and i am enthusiastic for this technology.Connect your
-          Ethereum wallet and wave at me!
+          I am{" "}
+          <a
+            target="_blank"
+            rel="noopener noreferrer"
+            href="https://twitter.com/kunal_ingawale"
+          >
+            Kunal
+          </a>
+          and i am enthusiastic for this technology.Connect your Ethereum wallet
+          and wave at me!
         </div>
 
-        <button className="waveButton" onClick={wave}>
-          Wave at Me
-        </button>
+        <div id="inputContainer">
+          <input id="msgInput" />
+          <button className="waveButton" onClick={wave}>
+            Wave at Me
+          </button>
+        </div>
 
         {!currentAccount && (
           <button className="waveButton" onClick={connectWallet}>
@@ -155,7 +167,8 @@ const App = () => {
             <div
               key={index}
               style={{
-                backgroundColor: "OldLace",
+                backgroundColor: "rgb(99, 102, 241)",
+                color: "white",
                 marginTop: "16px",
                 padding: "8px",
               }}
