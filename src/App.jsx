@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import "./App.css";
 import abi from "./utils/WavePortal.json";
+import Loader from "./Loader";
 
 const App = () => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [message, setMessage] = useState("");
-
+  const [isLoading, setIsLoading] = useState(false);
   const [allWaves, setAllWaves] = useState([]);
   const contractAddress = "0xb8Fed266Ea9A38ea5740E3A0B78d6821ca2ad26B";
 
@@ -104,6 +105,7 @@ const App = () => {
       const { ethereum } = window;
 
       if (ethereum) {
+        setIsLoading(true);
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
         const wavePortalContract = new ethers.Contract(
@@ -125,10 +127,12 @@ const App = () => {
         count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
         setMessage("");
+        setIsLoading(false);
       } else {
         console.log("Ethereum object doesn't exist!");
       }
     } catch (error) {
+      setIsLoading(false);
       console.log(error);
     }
   };
@@ -151,21 +155,30 @@ const App = () => {
           >
             Kunal
           </a>
-          and i am enthusiastic for this technology.Connect your Ethereum wallet
+          .i am enthusiastic for this technology.Connect your Ethereum wallet
           and wave at me!
         </div>
 
-        <div id="inputContainer">
-          <input
-            id="msgInput"
-            onChange={(e) => {
-              setMessage(e.target.value);
-            }}
-          />
-          <button className="waveButton" onClick={wave}>
-            Wave at Me
-          </button>
-        </div>
+        {!isLoading ? (
+          <div id="inputContainer">
+            <input
+              id="msgInput"
+              onChange={(e) => {
+                setMessage(e.target.value);
+              }}
+            />
+            <button className="waveButton" onClick={wave}>
+              Wave at Me
+            </button>
+          </div>
+        ) : (
+          <div className="loader">
+            <div>
+              <Loader />
+            </div>
+            <div>Transaction in progress...</div>
+          </div>
+        )}
 
         {!currentAccount && (
           <button className="waveButton" onClick={connectWallet}>
@@ -180,7 +193,7 @@ const App = () => {
             <div
               key={index}
               style={{
-                backgroundColor: "rgb(99, 102, 241)",
+                backgroundColor: "#c1d5c4",
                 color: "white",
                 marginTop: "16px",
                 padding: "8px",
