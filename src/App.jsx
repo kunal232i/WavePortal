@@ -1,55 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { ethers } from "ethers";
 import "./App.css";
+import { ethers } from "ethers";
 import abi from "./utils/WavePortal.json";
 import Loader from "./Loader";
-
+// import * as confetti from "canvas-confetti";
 const App = () => {
   const [currentAccount, setCurrentAccount] = useState("");
+  const [showingConfetti, setShowingConfetti] = useState(false);
   const [message, setMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [allWaves, setAllWaves] = useState([]);
-  const contractAddress = "0xb8Fed266Ea9A38ea5740E3A0B78d6821ca2ad26B";
-
+  const [isLoading, setIsLoading] = useState(false);
+  const contractAddress = "0x30bF7C71F9cCE25522a0A31D32FAa18064eb3890";
   const contractABI = abi.abi;
-
-  const getAllWaves = async () => {
-    try {
-      const { ethereum } = window;
-      if (ethereum) {
-        const provider = new ethers.providers.Web3Provider(ethereum);
-        const signer = provider.getSigner();
-        const wavePortalContract = new ethers.Contract(
-          contractAddress,
-          contractABI,
-          signer
-        );
-
-        /*
-         * Call the getAllWaves method from your Smart Contract
-         */
-        const waves = await wavePortalContract.getAllWaves();
-
-        /*
-         * We only need address, timestamp, and message in our UI so let's
-         * pick those out
-         */
-        let wavesCleaned = [];
-        waves.forEach((wave) => {
-          wavesCleaned.push({
-            address: wave.waver,
-            timestamp: new Date(wave.timestamp * 1000),
-            message: wave.message,
-          });
-        });
-        setAllWaves(wavesCleaned);
-      } else {
-        console.log("Ethereum object doesn't exist!");
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const checkIfWalletIsConnected = async () => {
     try {
@@ -77,6 +39,41 @@ const App = () => {
     }
   };
 
+  const showConfetti = ({ ethWon }) => {
+    setShowingConfetti(true);
+    alert(
+      `You won! Congratulations! 🎉. You have got ${ethWon.toNumber()} ethers.`
+    );
+    setTimeout(() => {
+      const myConfetti = confetti.create(document.querySelector("canvas"), {
+        resize: true,
+      });
+      for (let i = 1; i <= 3; i++) {
+        setTimeout(() => {
+          new Array(5).fill(0).map(() =>
+            myConfetti({
+              angle: random(60, 120),
+              spread: random(10, 50),
+              particleCount: random(40, 50),
+              origin: {
+                y: 0.6,
+              },
+            })
+          );
+        }, 750 * i);
+      }
+
+      setTimeout(() => {
+        setShowingConfetti(false);
+      }, 5000);
+    }, 0);
+  };
+
+  const random = (min, max) => Math.random() * (max - min) + min;
+
+  /**
+   * Implement your connectWallet method here
+   */
   const connectWallet = async () => {
     try {
       const { ethereum } = window;
@@ -89,8 +86,59 @@ const App = () => {
       const accounts = await ethereum.request({
         method: "eth_requestAccounts",
       });
+
       console.log("Connected", accounts[0]);
       setCurrentAccount(accounts[0]);
+      getAllWaves();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  /*
+   * Create a method that gets all waves from your contract
+   */
+  const getAllWaves = async () => {
+    try {
+      const { ethereum } = window;
+      if (ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum);
+        const signer = provider.getSigner();
+        const wavePortalContract = new ethers.Contract(
+          contractAddress,
+          contractABI,
+          signer
+        );
+
+        /*
+         * Call the getAllWaves method from your Smart Contract
+         */
+        const waves = await wavePortalContract.getAllWaves();
+
+        /*
+         * We only need address, timestamp, and message in our UI so let's
+         * pick those out
+         */
+        let wavesCleaned = [];
+        waves.forEach((wave) => {
+          console.log(wave);
+          wavesCleaned.push({
+            address: wave.waver,
+            timestamp: new Date(wave.timestamp * 1000),
+            message: wave.message,
+            hasWon: wave.message,
+            ethWon: wave.ethWon,
+          });
+        });
+
+        /*
+         * Store our data in React State
+         */
+        setAllWaves(wavesCleaned);
+        console.log("WHAT");
+      } else {
+        console.log("Ethereum object doesn't exist!");
+      }
     } catch (error) {
       console.log(error);
     }
@@ -103,7 +151,9 @@ const App = () => {
         return;
       }
       const { ethereum } = window;
-
+      /**
+       * Create a variable here that holds the contract address after you deploy!
+       */
       if (ethereum) {
         setIsLoading(true);
         const provider = new ethers.providers.Web3Provider(ethereum);
@@ -117,13 +167,16 @@ const App = () => {
         let count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
 
-        const waveTxn = await wavePortalContract.wave(message);
+        /*
+         * Execute the actual wave from your smart contract
+         */
+        const waveTxn = await wavePortalContract.wave(message, {
+          gasLimit: 10_000_00,
+        });
         console.log("Mining...", waveTxn.hash);
 
         await waveTxn.wait();
         console.log("Mined -- ", waveTxn.hash);
-
-        getAllWaves();
         count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
         setMessage("");
@@ -137,12 +190,67 @@ const App = () => {
     }
   };
 
+  /**
+   * Listen in for emitter events!
+   */
+  useEffect(() => {
+    let wavePortalContract;
+    console.log("listening");
+    const onNewWave = (from, timestamp, message, ethWon, hasWon) => {
+      console.log("NewWave");
+      console.log({
+        from,
+        timestamp,
+        message,
+        hasWon,
+        ethWon,
+      });
+      console.log("account", currentAccount);
+      console.log("from", from);
+      setAllWaves((prevState) => [
+        ...prevState,
+        {
+          address: from,
+          timestamp: new Date(timestamp * 1000),
+          message,
+          hasWon,
+          ethWon,
+        },
+      ]);
+      if (from.toLowerCase() === currentAccount.toLowerCase() && hasWon) {
+        showConfetti({
+          ethWon,
+        });
+      }
+    };
+
+    if (window.ethereum) {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+
+      wavePortalContract = new ethers.Contract(
+        contractAddress,
+        contractABI,
+        signer
+      );
+      console.log("attaching listener");
+      wavePortalContract.on("NewWave", onNewWave);
+    }
+
+    return () => {
+      if (wavePortalContract) {
+        wavePortalContract.off("NewWave", onNewWave);
+      }
+    };
+  }, [currentAccount]);
+
   useEffect(() => {
     checkIfWalletIsConnected();
   }, []);
 
   return (
     <div className="mainContainer">
+      {showingConfetti && <canvas className="canvas" id="canvas" />}
       <div className="dataContainer">
         <h1 className="header">👋 Hey there!</h1>
 
@@ -151,12 +259,12 @@ const App = () => {
           <a
             target="_blank"
             rel="noopener noreferrer"
-            href="https://twitter.com/kunal_ingawale"
+            href="https://twitter.com/codewith_ahsan"
           >
-            Kunal
-          </a>
-          .i am enthusiastic for this technology.Connect your Ethereum wallet
-          and wave at me!
+            Ahsan
+          </a>{" "}
+          and I make the world a better place using Software. Connect your
+          Ethereum wallet and wave at me!
         </div>
 
         {!isLoading ? (
@@ -180,6 +288,9 @@ const App = () => {
           </div>
         )}
 
+        {/*
+         * If there is no currentAccount render this button
+         */}
         {!currentAccount && (
           <button className="waveButton" onClick={connectWallet}>
             Connect Wallet
@@ -190,15 +301,7 @@ const App = () => {
 
         {allWaves.map((wave, index) => {
           return (
-            <div
-              key={index}
-              style={{
-                backgroundColor: "#c1d5c4",
-                color: "white",
-                marginTop: "16px",
-                padding: "8px",
-              }}
-            >
+            <div key={index} style={waveMessageBoxStyles}>
               <div>Address: {wave.address}</div>
               <div>Time: {wave.timestamp.toString()}</div>
               <div>Message: {wave.message}</div>
@@ -209,4 +312,13 @@ const App = () => {
     </div>
   );
 };
+
+const waveMessageBoxStyles = {
+  backgroundColor: "rgb(99, 102, 241)",
+  color: "white",
+  marginTop: "16px",
+  padding: "8px",
+  borderRadius: "14px",
+};
+
 export default App;
