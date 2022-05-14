@@ -10,7 +10,7 @@ const App = () => {
   const [message, setMessage] = useState("");
   const [allWaves, setAllWaves] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const contractAddress = "0x30bF7C71F9cCE25522a0A31D32FAa18064eb3890";
+  const contractAddress = "0xc21Fc2cbD9ca36b927C6DB53C4CbF6f06cfe4e94";
   const contractABI = abi.abi;
 
   const checkIfWalletIsConnected = async () => {
@@ -259,9 +259,9 @@ const App = () => {
           <a
             target="_blank"
             rel="noopener noreferrer"
-            href="https://twitter.com/codewith_ahsan"
+            href="https://twitter.com/kunal_ingawale"
           >
-            Ahsan
+            Kunal
           </a>{" "}
           and I make the world a better place using Software. Connect your
           Ethereum wallet and wave at me!
