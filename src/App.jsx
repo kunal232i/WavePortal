@@ -3,7 +3,7 @@ import "./App.css";
 import { ethers } from "ethers";
 import abi from "./utils/WavePortal.json";
 import Loader from "./Loader";
-// import * as confetti from "canvas-confetti";
+
 const App = () => {
   const [currentAccount, setCurrentAccount] = useState("");
   const [showingConfetti, setShowingConfetti] = useState(false);
@@ -71,9 +71,6 @@ const App = () => {
 
   const random = (min, max) => Math.random() * (max - min) + min;
 
-  /**
-   * Implement your connectWallet method here
-   */
   const connectWallet = async () => {
     try {
       const { ethereum } = window;
@@ -95,9 +92,6 @@ const App = () => {
     }
   };
 
-  /*
-   * Create a method that gets all waves from your contract
-   */
   const getAllWaves = async () => {
     try {
       const { ethereum } = window;
@@ -110,15 +104,8 @@ const App = () => {
           signer
         );
 
-        /*
-         * Call the getAllWaves method from your Smart Contract
-         */
         const waves = await wavePortalContract.getAllWaves();
 
-        /*
-         * We only need address, timestamp, and message in our UI so let's
-         * pick those out
-         */
         let wavesCleaned = [];
         waves.forEach((wave) => {
           console.log(wave);
@@ -131,9 +118,6 @@ const App = () => {
           });
         });
 
-        /*
-         * Store our data in React State
-         */
         setAllWaves(wavesCleaned);
         console.log("WHAT");
       } else {
@@ -151,9 +135,7 @@ const App = () => {
         return;
       }
       const { ethereum } = window;
-      /**
-       * Create a variable here that holds the contract address after you deploy!
-       */
+
       if (ethereum) {
         setIsLoading(true);
         const provider = new ethers.providers.Web3Provider(ethereum);
@@ -167,9 +149,6 @@ const App = () => {
         let count = await wavePortalContract.getTotalWaves();
         console.log("Retrieved total wave count...", count.toNumber());
 
-        /*
-         * Execute the actual wave from your smart contract
-         */
         const waveTxn = await wavePortalContract.wave(message, {
           gasLimit: 10_000_00,
         });
@@ -190,9 +169,6 @@ const App = () => {
     }
   };
 
-  /**
-   * Listen in for emitter events!
-   */
   useEffect(() => {
     let wavePortalContract;
     console.log("listening");
@@ -263,8 +239,7 @@ const App = () => {
           >
             Kunal
           </a>{" "}
-          and I make the world a better place using Software. Connect your
-          Ethereum wallet and wave at me!
+          Connect your Ethereum wallet and wave at me!
         </div>
 
         {!isLoading ? (
@@ -287,10 +262,6 @@ const App = () => {
             <div>Transaction in progress...</div>
           </div>
         )}
-
-        {/*
-         * If there is no currentAccount render this button
-         */}
         {!currentAccount && (
           <button className="waveButton" onClick={connectWallet}>
             Connect Wallet
