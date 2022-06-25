@@ -3,6 +3,27 @@ import "./App.css";
 import { ethers } from "ethers";
 import abi from "./utils/WavePortal.json";
 import Loader from "./Loader";
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDuuvh4PcSzEfSlXPeTEQK0M6edcEHb88E",
+  authDomain: "waveportal-14268.firebaseapp.com",
+  projectId: "waveportal-14268",
+  storageBucket: "waveportal-14268.appspot.com",
+  messagingSenderId: "205597790639",
+  appId: "1:205597790639:web:98bd99eaf3aba3a4101f5a",
+  measurementId: "G-VQ7QDXWJCC",
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
 const App = () => {
   const [currentAccount, setCurrentAccount] = useState("");
